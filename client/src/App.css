@@ -1,0 +1,15 @@
+.grid {
+  display: flex;
+  width: 35rem;
+  flex-wrap: wrap;
+  margin: 5rem auto;
+}
+.cell {
+  width: 10rem;
+  border: 2px solid #00000064;
+  height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
