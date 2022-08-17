@@ -65,8 +65,12 @@ function App() {
           setTurn(!turn);
           let temp = grid;
           let won = false;
-          for (var i = 0; i < 5; i++) {
-            if ((temp[4] === temp[4 - i]) === temp[4 + i] && temp[4] !== 0) {
+          for (var i = 1; i < 5; i++) {
+            if (
+              temp[4] === temp[4 - i] &&
+              temp[4] === temp[4 + i] &&
+              temp[4] !== 0
+            ) {
               won = true;
             }
           }
