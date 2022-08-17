@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { io } from "socket.io-client";
+import done from "./assets/done.mp3";
+import wait from "./assets/wait.mp3";
 
 function App() {
   const [grid, setGrid] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -9,6 +11,8 @@ function App() {
   const [sNo, setSNo] = useState();
   const [click, setclick] = useState(false);
   const [turn, setTurn] = useState(false);
+  const waitAudio = new Audio(wait);
+  const doneAudio = new Audio(done);
 
   useEffect(() => {
     let tempS = io("http://localhost:3001");
@@ -40,6 +44,17 @@ function App() {
           );
         }
       });
+      socket.on("winner", ({ el, els }) => {
+        setGrid(els.map((ele) => ele));
+        setTimeout(() => {
+          if (el === x) {
+            alert("you win");
+          } else {
+            alert("you lose");
+            doneAudio.play();
+          }
+        }, 500);
+      });
     }
   }, [socket]);
 
@@ -50,6 +65,31 @@ function App() {
           socket.emit("grid", { el: grid, sNo: sNo, t: turn });
           setclick(false);
           setTurn(!turn);
+          let temp = grid;
+          let won = false;
+          for (var i = 0; i < 5; i++) {
+            if ((temp[4] === temp[4 - i]) === temp[4 + i] && temp[4] !== 0) {
+              won = true;
+            }
+          }
+          if (
+            //column
+            (temp[3] === temp[0] && temp[0] === temp[6] && temp[6] !== 0) ||
+            (temp[2] === temp[5] && temp[5] === temp[8] && temp[2] !== 0) ||
+            //row
+            (temp[0] === temp[1] && temp[1] === temp[2] && temp[2] !== 0) ||
+            (temp[6] === temp[7] && temp[7] === temp[8] && temp[6] !== 0)
+          ) {
+            won = true;
+          }
+
+          if (won) {
+            setTimeout(() => {
+              doneAudio.play();
+              socket.emit("winner", { sNo: sNo, x: x, grid: grid });
+              alert("You win");
+            }, 500);
+          }
         }
       }
     }
@@ -83,6 +123,8 @@ function App() {
                 if (el === 0) {
                   if (turn === x) {
                     change(i);
+                  } else {
+                    waitAudio.play();
                   }
                 }
               }}

@@ -28,6 +28,9 @@ io.on("connection", (socket) => {
     socket.to(sNo.toString()).emit("gridL", el);
     socket.to(sNo.toString()).emit("switch", !t);
   });
+  socket.on("winner", ({ x, sNo, grid }) => {
+    socket.to(sNo.toString()).emit("winner", { el: x, els: grid });
+  });
 });
 
 httpServer.listen(3001, () => {
