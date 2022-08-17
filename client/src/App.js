@@ -15,7 +15,7 @@ function App() {
   const doneAudio = new Audio(done);
 
   useEffect(() => {
-    let tempS = io("http://localhost:3001");
+    let tempS = io(process.env.REACT_APP_URL);
     setSocket(tempS);
   }, []);
 
