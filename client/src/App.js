@@ -16,7 +16,6 @@ function App() {
 
   useEffect(() => {
     let tempS = io(process.env.REACT_APP_URL);
-    console.log(process.env.REACT_APP_URL);
     setSocket(tempS);
   }, []);
 
@@ -36,8 +35,6 @@ function App() {
       });
       socket.on("gridL", (el) => {
         if (el !== grid) {
-          console.log(grid);
-          console.log(el);
           setGrid(
             el.map((ele) => {
               return ele;
