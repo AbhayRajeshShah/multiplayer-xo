@@ -17,7 +17,7 @@ function App() {
   const [waiting, setWaiting] = useState(true);
 
   useEffect(() => {
-    let tempS = io(process.env.REACT_APP_URL);
+    let tempS = io(process.env.REACT_APP_URL || "http://localhost:3001");
     setSocket(tempS);
   }, []);
 
@@ -63,8 +63,9 @@ function App() {
           if (el === x) {
             alert("you win");
           } else {
-            alert("you lose");
             doneAudio.play();
+            alert("you lose");
+            setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
           }
         }, 500);
       });
@@ -108,13 +109,19 @@ function App() {
           ) {
             won = true;
           }
+          temp = temp.filter((el) => el === 0);
 
           if (won) {
             setTimeout(() => {
               doneAudio.play();
               socket.emit("winner", { sNo: sNo, x: x, grid: grid });
               alert("You win");
+              setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
             }, 500);
+          } else {
+            if (temp.length === 0) {
+              alert("draw");
+            }
           }
         }
       }
