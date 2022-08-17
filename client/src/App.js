@@ -8,11 +8,13 @@ function App() {
   const [grid, setGrid] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [x, setX] = useState(true);
   const [socket, setSocket] = useState();
-  const [sNo, setSNo] = useState();
+  const [sNo, setSNo] = useState(0);
   const [click, setclick] = useState(false);
   const [turn, setTurn] = useState(false);
   const waitAudio = new Audio(wait);
   const doneAudio = new Audio(done);
+  const [started, setStarted] = useState(false);
+  const [waiting, setWaiting] = useState(true);
 
   useEffect(() => {
     let tempS = io(process.env.REACT_APP_URL);
@@ -21,16 +23,29 @@ function App() {
 
   useEffect(() => {
     if (socket) {
-      socket.on("sNo", (el) => {
-        console.log(el);
-        setSNo(el);
-      });
       socket.on("switch", (el) => {
         setTurn(el);
         console.log(el);
         console.log(x);
       });
+      socket.on("join", (el) => {
+        console.log("hi");
+        if (el < 3) {
+          setStarted(true);
+          if (el > 1) {
+            setWaiting(false);
+          }
+        } else {
+          alert("Room is Full");
+        }
+      });
+      socket.on("new", (el) => {
+        if (el > 1) {
+          setWaiting(false);
+        }
+      });
       socket.on("turn", (el) => {
+        console.log(el);
         setX(el);
       });
       socket.on("gridL", (el) => {
@@ -55,6 +70,15 @@ function App() {
       });
     }
   }, [socket]);
+
+  const joinRoom = () => {
+    if (socket) {
+      if (sNo !== 0) {
+        socket.emit("joinRoom", sNo);
+        setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      }
+    }
+  };
 
   useEffect(() => {
     if (socket) {
@@ -115,27 +139,54 @@ function App() {
 
   return (
     <div className="App">
-      <div className="grid">
-        {grid.map((el, i) => {
-          return (
-            <div
-              className="cell"
-              key={i}
-              onClick={() => {
-                if (el === 0) {
-                  if (turn === x) {
-                    change(i);
-                  } else {
-                    waitAudio.play();
-                  }
-                }
-              }}
-            >
-              {el === 0 ? "" : el === 1 ? "X" : "O"}
-            </div>
-          );
-        })}
-      </div>
+      {started ? (
+        <>
+          <div className="grid">
+            {grid.map((el, i) => {
+              return (
+                <div
+                  className="cell"
+                  key={i}
+                  onClick={() => {
+                    if (!waiting) {
+                      if (el === 0) {
+                        if (turn === x) {
+                          change(i);
+                        } else {
+                          waitAudio.play();
+                        }
+                      }
+                    } else {
+                      alert("waiting for opponent");
+                    }
+                  }}
+                >
+                  {el === 0 ? "" : el === 1 ? "X" : "O"}
+                </div>
+              );
+            })}
+          </div>
+          <p>{waiting ? "Waiting For Opponent" : "Opponent Has Joined"}</p>
+        </>
+      ) : (
+        <div className="input">
+          <input
+            type="number"
+            placeholder="Enter Room No"
+            value={sNo == 0 ? "" : sNo}
+            onChange={(e) => {
+              setSNo(e.target.value);
+            }}
+          />
+          <button
+            onClick={() => {
+              joinRoom();
+            }}
+          >
+            Join
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,3 +1,6 @@
+body {
+  text-align: center;
+}
 .grid {
   display: flex;
   width: 35rem;
@@ -12,4 +15,24 @@
   justify-content: center;
   align-items: center;
   font-size: 3rem;
+}
+
+.input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+input {
+  margin: 0 2rem;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+}
+.input button {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: black;
+  color: white;
+  cursor: pointer;
 }
