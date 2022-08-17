@@ -16,6 +16,7 @@ function App() {
 
   useEffect(() => {
     let tempS = io(process.env.REACT_APP_URL);
+    console.log(process.env.REACT_APP_URL);
     setSocket(tempS);
   }, []);
 
