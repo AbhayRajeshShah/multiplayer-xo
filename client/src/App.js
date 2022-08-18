@@ -170,6 +170,12 @@ function App() {
                 <div
                   className="cell"
                   key={i}
+                  style={{
+                    borderLeftWidth: i % 3 === 0 ? "0px" : "2px",
+                    borderRightWidth: i % 3 === 2 ? "0px" : "2px",
+                    borderTopWidth: i / 3 < 1 ? "0px" : "2px",
+                    borderBottomWidth: i / 3 >= 2 ? "0px" : "2px",
+                  }}
                   onClick={() => {
                     if (!waiting) {
                       if (el === 0) {
@@ -189,7 +195,9 @@ function App() {
               );
             })}
           </div>
-          <p>{waiting ? "Waiting For Opponent" : "Opponent Has Joined"}</p>
+          <p style={{ fontSize: "1.15rem" }}>
+            {waiting ? "Waiting For Opponent" : "Opponent Has Joined"}
+          </p>
         </>
       ) : (
         <div className="input">
