@@ -61,6 +61,14 @@ function App() {
           );
         }
       });
+      socket.on("draw", (el) => {
+        if (el) {
+          alert("draw");
+          setTimeout(() => {
+            setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          }, 1000);
+        }
+      });
       socket.on("winner", ({ el, els }) => {
         setGrid(els.map((ele) => ele));
         setTimeout(() => {
@@ -68,7 +76,7 @@ function App() {
             alert("you win");
           } else {
             doneAudio.play();
-            alert("you lose");
+            alert("You Lose");
             setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
           }
         }, 500);
@@ -124,7 +132,11 @@ function App() {
             }, 500);
           } else {
             if (temp.length === 0) {
+              socket.emit("draw", sNo);
               alert("draw");
+              setTimeout(() => {
+                setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+              }, 1000);
             }
           }
         }

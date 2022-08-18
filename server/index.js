@@ -38,6 +38,9 @@ io.on("connection", (socket) => {
   socket.on("winner", ({ x, sNo, grid }) => {
     socket.to(sNo.toString()).emit("winner", { el: x, els: grid });
   });
+  socket.on("draw", (sNo) => {
+    socket.to(sNo.toString()).emit("draw", true);
+  });
 });
 
 httpServer.listen(process.env.PORT || 3001, () => {
