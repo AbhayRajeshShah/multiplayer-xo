@@ -3,6 +3,7 @@ import "./App.css";
 import { io } from "socket.io-client";
 import done from "./assets/done.mp3";
 import wait from "./assets/wait.mp3";
+import join from "./assets/join.mp3";
 
 function App() {
   const [grid, setGrid] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -13,6 +14,7 @@ function App() {
   const [turn, setTurn] = useState(false);
   const waitAudio = new Audio(wait);
   const doneAudio = new Audio(done);
+  const joinAudio = new Audio(join);
   const [started, setStarted] = useState(false);
   const [waiting, setWaiting] = useState(true);
 
@@ -31,6 +33,7 @@ function App() {
       socket.on("join", (el) => {
         console.log("hi");
         if (el < 3) {
+          joinAudio.play();
           setStarted(true);
           if (el > 1) {
             setWaiting(false);
@@ -40,6 +43,7 @@ function App() {
         }
       });
       socket.on("new", (el) => {
+        joinAudio.play();
         if (el > 1) {
           setWaiting(false);
         }
