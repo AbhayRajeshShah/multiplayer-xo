@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import done from "./assets/done.mp3";
 import wait from "./assets/wait.mp3";
 import join from "./assets/join.mp3";
+import takleef from "./assets/takleef.mp3";
 
 function App() {
   const [grid, setGrid] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -15,13 +16,21 @@ function App() {
   const waitAudio = new Audio(wait);
   const doneAudio = new Audio(done);
   const joinAudio = new Audio(join);
+  const takleefAudio = new Audio(takleef);
   const [started, setStarted] = useState(false);
   const [waiting, setWaiting] = useState(true);
+  const [counter, setCounter] = useState(0);
 
   useEffect(() => {
     let tempS = io(process.env.REACT_APP_URL || "http://localhost:3001");
     setSocket(tempS);
   }, []);
+
+  useEffect(() => {
+    if (counter > 2) {
+      takleefAudio.play();
+    }
+  }, [counter]);
 
   useEffect(() => {
     if (socket) {
@@ -180,9 +189,13 @@ function App() {
                     if (!waiting) {
                       if (el === 0) {
                         if (turn === x) {
+                          setCounter(0);
                           change(i);
                         } else {
-                          waitAudio.play();
+                          setCounter(counter + 1);
+                          if (counter < 2) {
+                            waitAudio.play();
+                          }
                         }
                       }
                     } else {
