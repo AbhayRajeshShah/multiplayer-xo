@@ -26,72 +26,65 @@ function App() {
     setSocket(tempS);
   }, []);
 
-  useEffect(() => {
-    if (counter > 2) {
-      takleefAudio.play();
-    }
-  }, [counter]);
+  if (counter > 2) {
+    takleefAudio.play();
+  }
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("switch", (el) => {
-        setTurn(el);
-        console.log(el);
-        console.log(x);
-      });
-      socket.on("join", (el) => {
-        console.log("hi");
-        if (el < 3) {
-          joinAudio.play();
-          setStarted(true);
-          if (el > 1) {
-            setWaiting(false);
-          }
-        } else {
-          alert("Room is Full");
-        }
-      });
-      socket.on("new", (el) => {
+  if (socket) {
+    socket.on("switch", (el) => {
+      setTurn(el);
+      console.log(el);
+      console.log(x);
+    });
+    socket.on("join", (el) => {
+      console.log("hi");
+      if (el < 3) {
         joinAudio.play();
+        setStarted(true);
         if (el > 1) {
           setWaiting(false);
         }
-      });
-      socket.on("turn", (el) => {
-        console.log(el);
-        setX(el);
-      });
-      socket.on("gridL", (el) => {
-        if (el !== grid) {
-          setGrid(
-            el.map((ele) => {
-              return ele;
-            })
-          );
-        }
-      });
-      socket.on("draw", (el) => {
-        if (el) {
-          alert("draw");
-          setTimeout(() => {
-            setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-          }, 1000);
-        }
-      });
-      socket.on("winner", ({ el, els }) => {
-        setGrid(els.map((ele) => ele));
+      } else {
+        alert("Room is Full");
+      }
+    });
+    socket.on("new", (el) => {
+      joinAudio.play();
+      if (el > 1) {
+        setWaiting(false);
+      }
+    });
+    socket.on("turn", (el) => {
+      console.log(el);
+      setX(el);
+    });
+    socket.on("gridL", (el) => {
+      if (el !== grid) {
+        setGrid(
+          el.map((ele) => {
+            return ele;
+          })
+        );
+      }
+    });
+    socket.on("draw", (el) => {
+      if (el) {
+        alert("draw");
         setTimeout(() => {
-          if (el === x) {
-            alert("you win");
-          } else {
-            doneAudio.play();
-            alert("You Lose");
-            setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-          }
-        }, 500);
-      });
-    }
-  }, [socket]);
+          setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        }, 1000);
+      }
+    });
+    socket.on("winner", ({ el, els }) => {
+      setGrid(els.map((ele) => ele));
+
+      setTimeout(() => {
+        doneAudio.play();
+        alert("You Lose");
+        setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      }, 500);
+    });
+  }
 
   const joinRoom = () => {
     if (socket) {
@@ -102,56 +95,54 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    if (socket) {
-      if (sNo) {
-        if (click) {
-          socket.emit("grid", { el: grid, sNo: sNo, t: turn });
-          setclick(false);
-          setTurn(!turn);
-          let temp = grid;
-          let won = false;
-          for (var i = 1; i < 5; i++) {
-            if (
-              temp[4] === temp[4 - i] &&
-              temp[4] === temp[4 + i] &&
-              temp[4] !== 0
-            ) {
-              won = true;
-            }
-          }
+  if (socket) {
+    if (sNo) {
+      if (click) {
+        socket.emit("grid", { el: grid, sNo: sNo, t: turn });
+        setclick(false);
+        setTurn(!turn);
+        let temp = grid;
+        let won = false;
+        for (var i = 1; i < 5; i++) {
           if (
-            //column
-            (temp[3] === temp[0] && temp[0] === temp[6] && temp[6] !== 0) ||
-            (temp[2] === temp[5] && temp[5] === temp[8] && temp[2] !== 0) ||
-            //row
-            (temp[0] === temp[1] && temp[1] === temp[2] && temp[2] !== 0) ||
-            (temp[6] === temp[7] && temp[7] === temp[8] && temp[6] !== 0)
+            temp[4] === temp[4 - i] &&
+            temp[4] === temp[4 + i] &&
+            temp[4] !== 0
           ) {
             won = true;
           }
-          temp = temp.filter((el) => el === 0);
+        }
+        if (
+          //column
+          (temp[3] === temp[0] && temp[0] === temp[6] && temp[6] !== 0) ||
+          (temp[2] === temp[5] && temp[5] === temp[8] && temp[2] !== 0) ||
+          //row
+          (temp[0] === temp[1] && temp[1] === temp[2] && temp[2] !== 0) ||
+          (temp[6] === temp[7] && temp[7] === temp[8] && temp[6] !== 0)
+        ) {
+          won = true;
+        }
+        temp = temp.filter((el) => el === 0);
 
-          if (won) {
+        if (won) {
+          setTimeout(() => {
+            doneAudio.play();
+            socket.emit("winner", { sNo: sNo, x: x, grid: grid });
+            alert("You win");
+            setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          }, 500);
+        } else {
+          if (temp.length === 0) {
+            socket.emit("draw", sNo);
+            alert("draw");
             setTimeout(() => {
-              doneAudio.play();
-              socket.emit("winner", { sNo: sNo, x: x, grid: grid });
-              alert("You win");
               setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-            }, 500);
-          } else {
-            if (temp.length === 0) {
-              socket.emit("draw", sNo);
-              alert("draw");
-              setTimeout(() => {
-                setGrid([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-              }, 1000);
-            }
+            }, 1000);
           }
         }
       }
     }
-  }, [grid, sNo, socket, click, turn]);
+  }
 
   const change = (ind) => {
     setGrid(
@@ -217,7 +208,7 @@ function App() {
           <input
             type="number"
             placeholder="Enter Room No"
-            value={sNo == 0 ? "" : sNo}
+            value={sNo === 0 ? "" : sNo}
             onChange={(e) => {
               setSNo(e.target.value);
             }}
